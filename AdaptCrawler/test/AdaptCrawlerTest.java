@@ -1,9 +1,17 @@
-import static org.junit.Assert.*;
+import static org.junit.Assert.fail;
+
+import java.io.IOException;
+
+import javax.swing.text.BadLocationException;
 
 import org.junit.Test;
 
+public class AdaptCrawlerTest extends AdaptCrawler {
 
-public class AdaptCrawlerTest {
+	/** Instance variables */
+	private String testURL = "http://abelsoul.co.uk";
+
+	AdaptCrawler classToTest = new AdaptCrawler();
 
 	@Test
 	public void testMain() {
@@ -12,22 +20,24 @@ public class AdaptCrawlerTest {
 
 	@Test
 	public void testProcessURL() {
-		fail("Not yet implemented");
+		// classToTest.processURL(testURL);
+		// assertEquals("Result", actuals);
 	}
 
 	@Test
-	public void testParsePage() {
-		fail("Not yet implemented");
+	public void testParsePage() throws IOException, BadLocationException {
+		classToTest.parsePage(testURL);
 	}
 
 	@Test
-	public void testHttpURLConnection() {
-		fail("Not yet implemented");
+	public void testHttpURLConnection() throws IOException {
+		classToTest.HttpURLConnection(testURL);
+		// assertEquals("Result", actuals );
 	}
 
 	@Test
-	public void testHtmlParse() {
-		fail("Not yet implemented");
+	public void testHtmlParse() throws IOException {
+		classToTest.HtmlParse(testURL);
 	}
 
 }

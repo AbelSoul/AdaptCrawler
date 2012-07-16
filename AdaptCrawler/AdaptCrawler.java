@@ -5,6 +5,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +28,9 @@ public class AdaptCrawler {
 
 	/** URL objects as instance variables */
 	private static URL testURL, siteURL;
+
+	/** String representing a default URL */
+	private static String defaultURL = "http://www.tyre-shopper.co.uk/";
 
 	/** Buffered reader to read incoming HTML */
 	private static BufferedReader reader;
@@ -69,12 +73,12 @@ public class AdaptCrawler {
 
 		// If no argument at command line use default
 		else {
-			input = "http://www.abelsoul.co.uk/";
+			input = defaultURL;
 			System.out.println("\nNo argument entered so default of " + input
-					+ " used: \n");
+					+ " used. \n");
 		}
 
-		// create String builder object for CVS file
+		// create String builder object for CVS file and add input URL
 		CvsString = new StringBuilder();
 		CvsString.append(input);
 		CvsString.append(",");
@@ -108,7 +112,6 @@ public class AdaptCrawler {
 
 		// input test URL and read from file input stream
 		try {
-
 			testURL = new URL(input);
 			reader = new BufferedReader(new InputStreamReader(
 					testURL.openStream()));
@@ -124,18 +127,11 @@ public class AdaptCrawler {
 				// other pages
 				HtmlParse(line);
 			}
-		} catch (Exception e) {
-
+		} catch (MalformedURLException e) {
 			e.printStackTrace();
 			System.out.println("Exception thrown");
 		}
-
-		// // Append URL to CVS StringBuilder //TODO
-		// CvsString.append(input);
-		// CvsString.append(",");
-
 		HttpURLConnection(testURL.toString());
-		// parsePage();
 	}
 
 	/**
@@ -164,37 +160,37 @@ public class AdaptCrawler {
 		// add to CSV file
 		CvsString.append(title);
 		CvsString.append(",");
-
 	}
-
-	// protected static void HttpURLRetrieval(String URL) throws IOException {
-	//
-	// }
 
 	/**
 	 * This method extracts the the HTTP status code as an integer and the URL
+	 * then appends them to a String for use as a CVS file
 	 * 
 	 * @throws IOException 
 	 */
 	protected static void HttpURLConnection(String URL) throws IOException {
 
-		URL pageURL = new URL(URL);
+		try {
+			URL pageURL = new URL(URL);
 
-		HttpURLConnection connection = (HttpURLConnection) pageURL
-				.openConnection();
-		stCode = connection.getResponseCode();
-		System.out.println("HTTP Status code: " + stCode);
+			HttpURLConnection connection = (HttpURLConnection) pageURL
+					.openConnection();
+			stCode = connection.getResponseCode();
+			System.out.println("HTTP Status code: " + stCode);
 
-		// append to CVS string
-		CvsString.append(stCode);
-		CvsString.append("\n");
+			// append to CVS string
+			CvsString.append(stCode);
+			CvsString.append("\n");
 
-		// retrieve URL
-		siteURL = connection.getURL();
-		System.out.println(siteURL + " = URL");
+			// retrieve URL
+			siteURL = connection.getURL();
+			System.out.println(siteURL + " = URL");
 
-		CvsString.append(siteURL);
-		CvsString.append(",");
+			CvsString.append(siteURL);
+			CvsString.append(",");
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -233,15 +229,13 @@ public class AdaptCrawler {
 					Object link = a.getAttribute(HTML.Attribute.HREF);
 					if (link != null) {
 						links.add(String.valueOf(link));
-						// System.out.println(link);
 
-						// cast to string for passing to method to get title and
+						// cast to string and pass to methods to get title,
 						// status
 						String pageURL = link.toString();
 						try {
-							// CvsString.append(String.valueOf(link));
 							parsePage(pageURL); // Title - To print URL, HTML
-												// page title, and HTTP status
+							// page title, and HTTP status
 							HttpURLConnection(pageURL); // Status
 							// pause for half a second between pages
 							Thread.sleep(500);
@@ -258,7 +252,6 @@ public class AdaptCrawler {
 			}
 		}, true);
 		aReader.close();
-		// System.out.println(links);
 	}
 
 	/**
@@ -269,12 +262,11 @@ public class AdaptCrawler {
 	private static void generateCsvFile(StringBuilder c) throws IOException {
 
 		try {
-
 			// create new file writer
 			FileWriter writer = new FileWriter("CVS.txt");
 
+			// append String representing CVS file
 			writer.append(c);
-
 			writer.flush();
 			writer.close();
 
@@ -282,7 +274,5 @@ public class AdaptCrawler {
 			e.printStackTrace();
 		}
 	}
-
 	// TODO Code to perform JUnit tests
-
 }
